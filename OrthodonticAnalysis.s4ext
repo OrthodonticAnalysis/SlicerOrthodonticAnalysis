@@ -22,13 +22,13 @@ Homepage https://youtu.be/M78xGVvGJ_Y
 
 # Firstname1 Lastname1 ([SubOrg1, ]Org1), Firstname2 Lastname2 ([SubOrg2, ]Org2)
 # For example: Jane Roe (Superware), John Doe (Lab1, Nowhere), Joe Bloggs (Noware)
-contributors Jo„o Vitor Coimbra (Federal University of EspÌrito Santo), Vinicius Batista (Federal University of EspÌrito Santo), Rafhael Milanezi (Federal University of EspÌrito Santo), Pedro Emmerich (Federal University of Rio de Janeiro), Lincoln Nojima (Federal University of Rio de Janeiro)
+contributors Jo√£o Vitor Coimbra (Federal University of Esp√≠rito Santo), Vinicius Batista (Federal University of Esp√≠rito Santo), Rafhael Milanezi (Federal University of Esp√≠rito Santo), Pedro Emmerich (Federal University of Rio de Janeiro), Lincoln Nojima (Federal University of Rio de Janeiro)
 
 # Match category in the xml description of the module (where it shows up in Modules menu)
 category Orthodontic
 
 # url to icon (png, size 128x128 pixels)
-iconurl 
+iconurl https://raw.githubusercontent.com/OrthodonticAnalysis/orthodontic-analysis-slicer-extension/master/Icon.png
 
 # Give people an idea what to expect from this code
 #  - Is it just a test or something you stand behind?
@@ -38,7 +38,7 @@ status Beta
 description The extension was developed to perform the most common dental analysis: model space discrepancies, Bolton and Peck and Peck
 
 # Space separated list of urls
-screenshoturls 
+screenshoturls https://raw.githubusercontent.com/OrthodonticAnalysis/orthodontic-analysis-slicer-extension/master/OrthodonticAnalysisScreenshot.png
 
 # 0 or 1: Define if the extension should be enabled after its installation.
 enabled 1
