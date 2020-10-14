@@ -89,6 +89,7 @@ class OrthodonticAnalysisWidget(ScriptedLoadableModuleWidget, VTKObservationMixi
     self._parameterNode = None
     self._updatingGUIFromParameterNode = False
     self._inputPointsNode = None
+    self._dockWidgetAdded = False
 
   def setup(self):
     """
@@ -119,6 +120,17 @@ class OrthodonticAnalysisWidget(ScriptedLoadableModuleWidget, VTKObservationMixi
     self.analysisButtonGroup.addButton(self.ui.analysisPeckAndPeckButton)
     self.analysisButtonGroup.addButton(self.ui.analysisAllButton)
 
+    # Point display dockable widget
+    mainWindow = slicer.util.mainWindow()
+    self.pointListDockWidget = qt.QDockWidget("Orthodontic Analysis Points", mainWindow)
+    self.pointListDockWidget.setObjectName("OrthodonticAnalysisPoints")
+    self.pointListDockWidget.setFeatures(qt.QDockWidget.DockWidgetClosable + qt.QDockWidget.DockWidgetMovable + qt.QDockWidget.DockWidgetFloatable)
+    self.pointListTextBrowser = qt.QTextBrowser()
+    self.pointListTextBrowser.lineWrapMode = qt.QTextBrowser.NoWrap
+    self.pointListDockWidget.setWidget(self.pointListTextBrowser)
+    slicer.w=self.pointListDockWidget
+    slicer.t=self.pointListTextBrowser
+
     # Connections
 
     # These connections ensure that we update parameter node when scene is closed
@@ -137,10 +149,22 @@ class OrthodonticAnalysisWidget(ScriptedLoadableModuleWidget, VTKObservationMixi
     # Make sure parameter node is initialized (needed for module reload)
     self.initializeParameterNode()
 
+  def showPointListWidget(self, show):
+    if show:
+      if self._dockWidgetAdded:
+        self.pointListDockWidget.show()
+      else:
+        self._dockWidgetAdded = True
+        slicer.util.mainWindow().addDockWidget(qt.Qt.RightDockWidgetArea, self.pointListDockWidget)
+    else:
+      if self.pointListDockWidget.parent():
+        self.pointListDockWidget.close()
+
   def cleanup(self):
     """
     Called when the application closes and the module widget is destroyed.
     """
+    slicer.util.mainWindow().removeDockWidget(self.pointListDockWidget)
     self.removeObservers()
 
   def enter(self):
@@ -156,6 +180,7 @@ class OrthodonticAnalysisWidget(ScriptedLoadableModuleWidget, VTKObservationMixi
     """
     # Do not react to parameter node changes (GUI wlil be updated when the user enters into the module)
     self.removeObserver(self._parameterNode, vtk.vtkCommand.ModifiedEvent, self.updateGUIFromParameterNode)
+    self.showPointListWidget(False)
 
   def onSceneStartClose(self, caller, event):
     """
@@ -207,6 +232,7 @@ class OrthodonticAnalysisWidget(ScriptedLoadableModuleWidget, VTKObservationMixi
 
     # Initial GUI update
     self.updateGUIFromParameterNode()
+    self.onInputPointsModified()
 
   def updateGUIFromParameterNode(self, caller=None, event=None):
     """
@@ -296,7 +322,8 @@ class OrthodonticAnalysisWidget(ScriptedLoadableModuleWidget, VTKObservationMixi
     analysisType = self._parameterNode.GetParameter("AnalysisType")
     inputPointsNode = self._parameterNode.GetNodeReference("InputPoints")
     if (not analysisType) or (not inputPointsNode):
-      self.ui.pointListHelpTextBrowser.setPlainText("")
+      self.pointListTextBrowser.setPlainText("")
+      self.showPointListWidget(False)
       return
 
     numberOfDefinedControlPoints = inputPointsNode.GetNumberOfDefinedControlPoints()
@@ -309,22 +336,31 @@ class OrthodonticAnalysisWidget(ScriptedLoadableModuleWidget, VTKObservationMixi
 
     pointDescription = "<html>\n<ol>\n"
     for pointIndex, [shortName, longName] in enumerate(pointNames):
-      if pointIndex < numberOfDefinedControlPoints:
+      style = ""
+      if pointIndex < numberOfDefinedControlPoints:  
         prefix = "&#x2611;"  # checked box (already placed)
       elif pointIndex == numberOfDefinedControlPoints:
         prefix = "&raquo;"  # double-arrow (being placed)
+        style="font-weight: bold;"
       else:
         prefix = "&#x2610;"  # empty box (to be placed)
-      pointDescription += "<li>{0} {1} ({2})</li>\n".format(prefix, longName, shortName)
+      pointDescription += '<li id="{0}"><div style="{1}">{2} {3} ({4})</div></li>\n'.format(shortName, style, prefix, longName, shortName)
       if pointIndex < numberOfControlPoints:
         # Only show label of the current point (unless markup is complete)
         label = shortName if (showAllPointLabels or (pointIndex == numberOfDefinedControlPoints)) else ""
         inputPointsNode.SetNthControlPointLabel(pointIndex, label)
     pointDescription += "</html>\n"
-    self.ui.pointListHelpTextBrowser.setHtml(pointDescription)
+    self.pointListTextBrowser.setHtml(pointDescription)
 
     if numberOfDefinedControlPoints>=len(pointNames):
+      # finished landmarking
       self.ui.MarkupsPlaceWidget.placeModeEnabled = False
+      self.showPointListWidget(False)
+    else:
+      # landmarking is in progress
+      self.showPointListWidget(True)
+      topPointShownInList = max(numberOfDefinedControlPoints - 3, 0)
+      self.pointListTextBrowser.scrollToAnchor(pointNames[topPointShownInList][0])
 
     wasModified = inputPointsNode.StartModify()
     while inputPointsNode.GetNumberOfControlPoints() > len(pointNames):
@@ -410,9 +446,9 @@ class OrthodonticAnalysisLogic(ScriptedLoadableModuleLogic):
     pointsInferiorMid = [
       ["35-34-D", "Distal point of Teeth segment 35-34"],
       ["35-34-M-33-D", "Mesial point of Teeth segment 35-34 and Distal of Tooth 33"],
-      ["33-M", "Mesial point of Tooth segment 33"],
+      ["33-MS", "Mesial point of Tooth segment 33"],
       ["IAM", "Inferior Arch Midpoint"],
-      ["43-M", "Mesial point of Tooth segment 43"],
+      ["43-MS", "Mesial point of Tooth segment 43"],
       ["45-44-M-43-D", "Mesial point of Teeth segment 45-44 and Distal of Tooth 43"],
       ["45-44-D", "Distal point of Teeth segment 45-44"],
     ]
@@ -434,9 +470,9 @@ class OrthodonticAnalysisLogic(ScriptedLoadableModuleLogic):
     pointsSuperiorMid = [
       ["15-14-D", "Distal point of Teeth segment 15-14"],
       ["15-14-M-13-D", "Mesial point of Teeth segment 15-14 and Distal of Tooth 13"],
-      ["13-M", "Mesial point of Tooth segment 13"],
+      ["13-MS", "Mesial point of Tooth segment 13"],
       ["SAM", "Superior Arch Midpoint"],
-      ["23-M", "Mesial point of Tooth segment 23"],
+      ["23-MS", "Mesial point of Tooth segment 23"],
       ["25-24-M-23-D", "Mesial point of Teeth segment 25-24 and Distal of Tooth 23"],
       ["25-24-D", "Distal point of Teeth segment 25-24"],
     ]
@@ -459,7 +495,13 @@ class OrthodonticAnalysisLogic(ScriptedLoadableModuleLogic):
     self.pointsAll.extend(self.pointsBolton)
     self.pointsAll.extend(pointsSuperiorMid)
     self.pointsAll.extend(pointsInferiorMid)
-    self.pointsAll.extend(self.pointsPeckAndPeck)
+    # Peck and Peck without medial-distal points
+    self.pointsAll.extend([
+      ["32-V", "Vestibular point of Tooth 32"], ["32-L", "Lingual point of Tooth 32"],
+      ["31-V", "Vestibular point of Tooth 31"], ["31-L", "Lingual point of Tooth 31"],
+      ["41-V", "Vestibular point of Tooth 41"], ["41-L", "Lingual point of Tooth 41"],
+      ["42-V", "Vestibular point of Tooth 42"], ["42-L", "Lingual point of Tooth 42"],
+    ])
 
   def setDefaultParameters(self, parameterNode):
     """

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>292</width>
+    <width>341</width>
     <height>471</height>
    </rect>
   </property>
@@ -100,22 +100,6 @@
         </property>
        </widget>
       </item>
-      <item row="7" column="0" colspan="2">
-       <widget class="ctkCollapsibleGroupBox" name="CollapsibleGroupBox">
-        <property name="title">
-         <string>Point placement instructions </string>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout_2">
-         <item>
-          <widget class="ctkFittedTextBrowser" name="pointListHelpTextBrowser">
-           <property name="lineWrapMode">
-            <enum>QTextEdit::NoWrap</enum>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
      </layout>
     </widget>
    </item>
@@ -176,17 +160,6 @@
    <extends>QWidget</extends>
    <header>ctkCollapsibleButton.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>ctkCollapsibleGroupBox</class>
-   <extends>QGroupBox</extends>
-   <header>ctkCollapsibleGroupBox.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>ctkFittedTextBrowser</class>
-   <extends>QTextBrowser</extends>
-   <header>ctkFittedTextBrowser.h</header>
   </customwidget>
   <customwidget>
    <class>ctkPathLineEdit</class>
