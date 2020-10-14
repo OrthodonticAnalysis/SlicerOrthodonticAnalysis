@@ -4,8 +4,8 @@ project(OrthodonticAnalysis)
 
 #-----------------------------------------------------------------------------
 # Extension meta-information
-set(EXTENSION_HOMEPAGE "https://youtu.be/M78xGVvGJ_Y")
-set(EXTENSION_CATEGORY "Orthodontic")
+set(EXTENSION_HOMEPAGE "https://github.com/OrthodonticAnalysis/orthodontic-analysis-slicer-extension")
+set(EXTENSION_CATEGORY "Orthodontics")
 set(EXTENSION_CONTRIBUTORS "João Vitor Lima Coimbra (Federal University of Espírito Santo), Vinicius Campos de Oliveira Batista (Federal University of Espírito Santo), Rafhael Milanezi de Andrade (Federal University of Espírito Santo), Pedro Lima Emmerich Oliveira (Federal University of Rio de Janeiro), Lincoln Issamu Nojima (Federal University of Rio de Janeiro)")
 set(EXTENSION_DESCRIPTION "The extension was developed to perform the most common dental analysis: model space discrepancies, Bolton and Peck and Peck. All point instructions for performing the analysis are available in Python interactor after study method points are selected. The Analysis button shows the result.
 The model discrepancy calculates the difference between the required space and the present space. If the difference is positive, there is an excess of space available, if the difference is negative, it means that there is a space deficit.
