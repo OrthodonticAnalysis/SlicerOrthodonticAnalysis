@@ -19,13 +19,13 @@ class OrthodonticAnalysis(ScriptedLoadableModule):
     self.parent.title = "Orthodontic Analysis"  # TODO: make this more human readable by adding spaces
     self.parent.categories = ["Orthodontics"]  # TODO: set categories (folders where the module shows up in the module selector)
     self.parent.dependencies = []  # TODO: add here list of module names that this module requires
-    self.parent.contributors = ["Jo�o Vitor Lima Coimbra (Federal University of Esp�rito Santo",
-      "Vinicius Campos de Oliveira Batista (Federal University of Esp�rito Santo)",
-      "Rafhael Milanezi de Andrade (Federal University of Esp�rito Santo)",
-      "Pedro Lima Emmerich Oliveira (Federal University of Rio de Janeiro)",
-      "Lincoln Issamu Nojima (Federal University of Rio de Janeiro)"]
+    self.parent.contributors = ["João Vitor Coimbra (Federal University of Espírito Santo)",
+      "Vinicius Batista (Federal University of Espírito Santo)",
+      "Rafhael Milanezi (Federal University of Espírito Santo)",
+      "Pedro Emmerich (Federal University of Rio de Janeiro)",
+      "Lincoln Nojima (Federal University of Rio de Janeiro)"]
     self.parent.helpText = """The extension was developed to perform the most common dental analysis: model space discrepancies, Bolton and Peck and Peck.<br>
-For instructions, see the <a href="https://github.com/OrthodonticAnalysis/orthodontic-analysis-slicer-extension">extension documentation</a> or this video tutorial: <a href="https://youtu.be/M78xGVvGJ_Y">https://youtu.be/M78xGVvGJ_Y</a>.
+For instructions, see the <a href="https://github.com/OrthodonticAnalysis/SlicerOrthodonticAnalysis#orthodontic-analysis">extension documentation</a>.
 In case of doubts, sent an e-mail to: pedroemmerich@hotmail.com<br>
 """
     # TODO: replace with organization, grant and thanks
@@ -549,6 +549,8 @@ class OrthodonticAnalysisLogic(ScriptedLoadableModuleLogic):
     from time import gmtime, strftime
     timestamp = strftime("%Y%m%d-%H%M%S", gmtime())
     reportFilename = "{0}/OrthodonticAnalysis-{1}-{2}.html".format(reportFolder, analysisType, timestamp)
+    reportScreenshotFilenameName = "OrthodonticAnalysis-{0}-{1}.png".format(analysisType, timestamp)
+    reportScreenshotFilename = "{0}/{1}".format(reportFolder, reportScreenshotFilenameName)
 
     if analysisType=="Superior":
       report = self.computeSuperiorSpaceAnalysis(inputPointsNode)
@@ -563,8 +565,16 @@ class OrthodonticAnalysisLogic(ScriptedLoadableModuleLogic):
     else:
       raise ValueError("Invalid analysisType: {0}".format(analysisType))
 
+    import ScreenCapture
+    cap = ScreenCapture.ScreenCaptureLogic()
+    cap.showViewControllers(False)
+    cap.captureImageFromView(None, reportScreenshotFilename)
+    cap.showViewControllers(True)
+
+    screenshot = '<img src="{0}">'.format(reportScreenshotFilenameName)
+
     with open(reportFilename, 'w') as file_object:
-      file_object.write("<html>\n{0}\n</html>".format(report))
+      file_object.write("<html>\n{0}\n{1}\n</html>".format(report, screenshot))
 
     return reportFilename
 
