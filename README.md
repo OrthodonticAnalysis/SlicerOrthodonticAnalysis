@@ -14,6 +14,8 @@ The teeth evaluated in Peck and Peck analysis are the lower incisors. The measur
 
 Video tutorial (uses older version of the module but still informative): <a href="https://youtu.be/M78xGVvGJ_Y">https://youtu.be/M78xGVvGJ_Y</a>
 
+Video tutorial (current version): <a href="https://youtu.be/rkE7ARBNgA0">https://youtu.be/rkE7ARBNgA0</a>
+
 ## Instructions
 
 - Load an image or model where landmark points on teeth are recognizable. OrthodonticAnalysis / TeethSurface data set in Sample Data module can be used for testing.
